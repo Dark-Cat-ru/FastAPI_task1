@@ -1,7 +1,7 @@
 import asyncio
 import uvicorn
 
-from src.app import create_app
+from app import create_app
 
 app = create_app()
 
@@ -17,5 +17,4 @@ async def run() -> None:
 
 
 if __name__ == "__main__":
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(run())
+    asyncio.run(run())
