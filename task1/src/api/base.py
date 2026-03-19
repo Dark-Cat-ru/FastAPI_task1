@@ -1,6 +1,5 @@
 from fastapi import APIRouter, status, HTTPException
-from models.users import User
-from models.cats import Cat
+from shemas.users import User
 
 router = APIRouter()
 
@@ -15,19 +14,23 @@ user_repo = [
     },
 ]
 
-@router.get("/cats", status_code=status.HTTP_200_OK)
-async def get_cat_data(cat: Cat):
-    response = {
-        "name": cat.name,
-        "color": cat.color,
-        "birth_year": cat.birth_year,
-        "owner": cat.owner.login
-    }
-    return response
+@router.get("/users/<user_name>", status_code=status.HTTP_200_OK)
+async def get_user_data(user_name: str):
+    for i in user_repo:
+        if i['login'] == user_name:
+            responce = {
+                "login": i["login"],
+            }
+            return responce
+        else:
+            raise HTTPException(
+                detail="Не найден пользователь с таким логином",
+                status_code=status.HTTP_404_NOT_FOUND,
+            )
 
 @router.post("/create_user", status_code=status.HTTP_201_CREATED, response_model=User)
 async def create_user(new_user: User):
-    if len(new_user.login) < 3:
+    if len(new_user.login) <= 3:
         raise HTTPException(
             detail="Длина логина должна быть не меньше 3 символов",
             status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
@@ -46,7 +49,7 @@ async def create_user(new_user: User):
 
 @router.put("/change_user/<user_login>", status_code=status.HTTP_200_OK, response_model=User)
 async def change_user_data(user: User, user_login: str):
-    if len(user.login) < 3:
+    if len(user.login) <= 3:
         raise HTTPException(
             detail="Длина логина должна быть не меньше 3 символов",
             status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
